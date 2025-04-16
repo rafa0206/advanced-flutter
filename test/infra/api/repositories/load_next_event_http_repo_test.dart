@@ -2,7 +2,7 @@ import 'package:advanced_flutter/domain/entities/domain_error.dart';
 import 'package:advanced_flutter/infra/api/repositories/load_next_event_http_repo.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../helpers/fakes.dart';
+import '../../../helpers/fakes.dart';
 import '../clients/http_client_spy.dart';
 
 void main() {
