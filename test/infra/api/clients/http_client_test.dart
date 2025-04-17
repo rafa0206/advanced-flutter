@@ -7,17 +7,19 @@ import 'package:dartx/dartx.dart';
 import '../../../helpers/fakes.dart';
 import 'client_spy.dart';
 
+import 'dart:convert';
+
 class HttpClient {
   final Client client;
 
   HttpClient({required this.client});
 
-  Future<void> get({ required String url, Map<String, String>? headers, Map<String, String?>? params, Map<String, String>? queryString }) async {
+  Future<T> get<T>({ required String url, Map<String, String>? headers, Map<String, String?>? params, Map<String, String>? queryString }) async {
     final allHeaders = (headers ?? {})..addAll({ 'content-type': 'application/json', 'accept': 'application/json' });
     final uri = _buildUri(url: url, params: params, queryString: queryString);
     final response = await client.get(uri, headers: allHeaders);
     switch (response.statusCode) {
-      case 200: break;
+      case 200: return jsonDecode(response.body);
       case 401: throw DomainError.sessionExpired;
       default: throw DomainError.unexpected;
     }
@@ -37,6 +39,12 @@ void main() {
 
   setUp(() {
     client = ClientSpy();
+    client.responseJson = '''
+       {
+         "key1": "value1",
+         "key2": "value2"
+       }
+     ''';
     url = anyString();
     sut = HttpClient(client: client);
   });
@@ -124,6 +132,12 @@ void main() {
       client.simulateServerError();
       final future = sut.get(url: url);
       expect(future, throwsA(DomainError.unexpected));
+    });
+
+    test('should return a Map', () async {
+      final data = await sut.get(url: url);
+      expect(data['key1'], 'value1');
+      expect(data['key2'], 'value2');
     });
 
   });
