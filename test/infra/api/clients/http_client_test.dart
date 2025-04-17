@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:advanced_flutter/domain/entities/domain_error.dart';
+import 'package:advanced_flutter/infra/types/json.dart';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart';
@@ -6,8 +9,6 @@ import 'package:dartx/dartx.dart';
 
 import '../../../helpers/fakes.dart';
 import 'client_spy.dart';
-
-import 'dart:convert';
 
 class HttpClient {
   final Client client;
@@ -19,7 +20,10 @@ class HttpClient {
     final uri = _buildUri(url: url, params: params, queryString: queryString);
     final response = await client.get(uri, headers: allHeaders);
     switch (response.statusCode) {
-      case 200: return jsonDecode(response.body);
+      case 200: {
+        final data = jsonDecode(response.body);
+        return (T == JsonArr) ? data.map<Json>((e) => e as Json).toList() : data;
+      }
       case 401: throw DomainError.sessionExpired;
       default: throw DomainError.unexpected;
     }
@@ -135,9 +139,22 @@ void main() {
     });
 
     test('should return a Map', () async {
-      final data = await sut.get(url: url);
+      final data = await sut.get<Json>(url: url);
       expect(data['key1'], 'value1');
       expect(data['key2'], 'value2');
+    });
+
+    test('should return a List', () async {
+      client.responseJson = '''
+         [{
+           "key": "value1"
+         }, {
+           "key": "value2"
+         }]
+       ''';
+      final data = await sut.get<JsonArr>(url: url);
+      expect(data[0]['key'], 'value1');
+      expect(data[1]['key'], 'value2');
     });
 
   });
