@@ -5,11 +5,11 @@ import 'package:advanced_flutter/infra/api/mappers/next_event_mapper.dart';
 import 'package:advanced_flutter/infra/types/json.dart';
 import 'package:advanced_flutter/domain/entities/domain_error.dart';
 
-class LoadNextEventApiRepository implements LoadNextEventRepository {
+final class LoadNextEventApiRepository implements LoadNextEventRepository {
   final HttpGetClient httpClient;
   final String url;
 
-  LoadNextEventApiRepository({
+  const LoadNextEventApiRepository({
     required this.httpClient,
     required this.url
   });
@@ -20,4 +20,5 @@ class LoadNextEventApiRepository implements LoadNextEventRepository {
     if (json == null) throw DomainError.unexpected;
     return NextEventMapper.toObject(json);
   }
+
 }
