@@ -1,4 +1,5 @@
 import 'package:advanced_flutter/presentation/presenters/next_event_presenter.dart';
+import 'package:advanced_flutter/ui/components/player_position.dart';
 
 import 'package:flutter/material.dart';
 
@@ -9,7 +10,7 @@ final class NextEventPage extends StatefulWidget {
   const NextEventPage({
     required this.presenter,
     required this.groupId,
-    super.key
+    super.key,
   });
 
   @override
@@ -26,22 +27,36 @@ class _NextEventPageState extends State<NextEventPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: StreamBuilder<NextEventViewModel>(
-            stream: widget.presenter.nextEventStream,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState != ConnectionState.active) return const CircularProgressIndicator();
-              if (snapshot.hasError) return const SizedBox();
-              final viewModel = snapshot.data!;
-              return ListView(
-                  children: [
-                    if (viewModel.goalkeepers.isNotEmpty) ListSection(title: 'DENTRO - GOLEIROS', items: viewModel.goalkeepers),
-                    if (viewModel.players.isNotEmpty) ListSection(title: 'DENTRO - JOGADORES', items: viewModel.players),
-                    if (viewModel.out.isNotEmpty) ListSection(title: 'FORA', items: viewModel.out),
-                    if (viewModel.doubt.isNotEmpty) ListSection(title: 'DÚVIDA', items: viewModel.doubt)
-                  ]
-              );
-            }
-        )
+      body: StreamBuilder<NextEventViewModel>(
+        stream: widget.presenter.nextEventStream,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.active) return const CircularProgressIndicator();
+          if (snapshot.hasError) return const SizedBox();
+          final viewModel = snapshot.data!;
+          return ListView(children: [
+            if (viewModel.goalkeepers.isNotEmpty)
+              ListSection(
+                title: 'DENTRO - GOLEIROS',
+                items: viewModel.goalkeepers,
+              ),
+            if (viewModel.players.isNotEmpty)
+              ListSection(
+                title: 'DENTRO - JOGADORES',
+                items: viewModel.players,
+              ),
+            if (viewModel.out.isNotEmpty)
+              ListSection(
+                title: 'FORA',
+                items: viewModel.out,
+              ),
+            if (viewModel.doubt.isNotEmpty)
+              ListSection(
+                title: 'DÚVIDA',
+                items: viewModel.doubt,
+              )
+          ]);
+        },
+      ),
     );
   }
 }
@@ -53,17 +68,26 @@ final class ListSection extends StatelessWidget {
   const ListSection({
     required this.title,
     required this.items,
-    super.key
+    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
-        children: [
-          Text(title),
-          Text(items.length.toString()),
-          ...items.map((player) => Text(player.name))
-        ]
+      children: [
+        Text(title),
+        Text(
+          items.length.toString(),
+        ),
+        ...items.map(
+          (player) => Row(
+            children: [
+              Text(player.name),
+              PlayerPosition(position: player.position),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
