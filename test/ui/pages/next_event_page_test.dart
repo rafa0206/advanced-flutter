@@ -13,6 +13,7 @@ import '../../helpers/fakes.dart';
 
 final class NextEventPresenterSpy implements NextEventPresenter {
   int loadCallsCount = 0;
+  int reloadCallsCount = 0;
   String? groupId;
   var nextEventSubject = BehaviorSubject<NextEventViewModel>();
 
@@ -46,6 +47,13 @@ final class NextEventPresenterSpy implements NextEventPresenter {
     loadCallsCount++;
     this.groupId = groupId;
   }
+
+  @override
+  void reloadNextEvent({ required String groupId }) {
+    reloadCallsCount++;
+    this.groupId = groupId;
+  }
+
 }
 
 void main() {
@@ -183,5 +191,14 @@ void main() {
     expect(find.byType(PlayerPhoto), findsNothing);
     expect(find.text('Algo errado aconteceu, tente novamente.'), findsOneWidget);
     expect(find.text('Recarregar'), findsOneWidget);
+  });
+
+  testWidgets('should load event data on reload click', (tester) async {
+    await tester.pumpWidget(sut);
+    presenter.emitError();
+    await tester.pump();
+    await tester.tap(find.text('Recarregar'));
+    expect(presenter.reloadCallsCount, 1);
+    expect(presenter.groupId, groupId);
   });
 }
