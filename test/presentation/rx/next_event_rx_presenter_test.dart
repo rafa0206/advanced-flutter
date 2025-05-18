@@ -2,9 +2,9 @@
 import 'package:advanced_flutter/domain/entities/next_event.dart';
 import 'package:advanced_flutter/domain/entities/next_event_player.dart';
 import 'package:advanced_flutter/presentation/presenters/next_event_presenter.dart';
+
 import 'package:dartx/dartx.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:rxdart/rxdart.dart';
 
 import '../../helpers/fakes.dart';
@@ -36,17 +36,30 @@ final class NextEventRxPresenter {
       doubt: event.players.where((player) => player.confirmationDate == null).sortedBy((player) => player.name).map(_mapPlayer).toList(),
       out: event.players.where((player) => player.confirmationDate != null && !player.isConfirmed).sortedBy((player) => player.confirmationDate!).map(_mapPlayer).toList());
 
-  NextEventPlayerViewModel _mapPlayer(NextEventPlayer player) =>
-      NextEventPlayerViewModel(name: player.name, initials: player.initials, photo: player.photo, position: player.position);
+  NextEventPlayerViewModel _mapPlayer(NextEventPlayer player) => NextEventPlayerViewModel(
+        name: player.name,
+        initials: player.initials,
+        photo: player.photo,
+        position: player.position,
+        isConfirmed: player.confirmationDate == null ? null : false,
+      );
 }
 
 final class NextEventLoaderSpy {
   int callsCount = 0;
   String? groupId;
   Error? error;
-  NextEvent output = NextEvent(groupName: anyString(), date: anyDate(), players: []);
+  NextEvent output = NextEvent(
+    groupName: anyString(),
+    date: anyDate(),
+    players: [],
+  );
 
-  void simulatePlayers(List<NextEventPlayer> players) => output = NextEvent(groupName: anyString(), date: anyDate(), players: players);
+  void simulatePlayers(List<NextEventPlayer> players) => output = NextEvent(
+        groupName: anyString(),
+        date: anyDate(),
+        players: players,
+      );
 
   Future<NextEvent> call({required String groupId}) async {
     this.groupId = groupId;
@@ -147,6 +160,26 @@ void main() {
       expect(event.out[0].name, 'E');
       expect(event.out[1].name, 'C');
       expect(event.out[2].name, 'D');
+    });
+    await sut.loadNextEvent(groupId: groupId);
+  });
+
+  test('should map out player', () async {
+    final player = NextEventPlayer(
+      id: anyString(),
+      name: anyString(),
+      isConfirmed: false,
+      photo: anyString(),
+      position: anyString(),
+      confirmationDate: anyDate(),
+    );
+    nextEventLoader.simulatePlayers([player]);
+    sut.nextEventStream.listen((event) {
+      expect(event.out[0].name, player.name);
+      expect(event.out[0].initials, player.initials);
+      expect(event.out[0].isConfirmed, player.isConfirmed);
+      expect(event.out[0].photo, player.photo);
+      expect(event.out[0].position, player.position);
     });
     await sut.loadNextEvent(groupId: groupId);
   });
