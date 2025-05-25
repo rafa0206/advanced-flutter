@@ -80,7 +80,7 @@ void main() {
     final sut = MaterialApp(home: NextEventPage(presenter: presenter, groupId: anyString()));
     await tester.pumpWidget(sut);
     await tester.pump();
-    expect(find.text('Cristiano Ronaldo'), findsOneWidget);
+    expect(find.text('Rafael Fernandes'), findsOneWidget);
     expect(find.text('Lionel Messi'), findsOneWidget);
     expect(find.text('Claudio Gamarra'), findsOneWidget);
   });

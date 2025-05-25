@@ -1,4 +1,9 @@
 // use-case
+
+//esse arquivo estava no diretorio test/domain/usecases/next_event_loader_test.dart
+//caso eu apenas comentasse ele causaria erro na execução dos testes,
+//por isso movi esse arquivo para esse diretorio.
+
 // import 'package:advanced_flutter/domain/entities/next_event.dart';
 // import 'package:advanced_flutter/domain/entities/next_event_player.dart';
 // import 'package:advanced_flutter/domain/repositories/load_next_event_repo.dart';
