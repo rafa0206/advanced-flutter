@@ -73,8 +73,10 @@ void main() {
     ''';
     final httpClient = HttpAdapter(client: client);
     final repo = LoadNextEventApiRepository(httpClient: httpClient, url: anyString());
-    final nextEventLoader = NextEventLoader(repo: repo);
-    final presenter = NextEventRxPresenter(nextEventLoader: nextEventLoader);
+    //use-case
+    // final nextEventLoader = NextEventLoader(repo: repo);
+    // final presenter = NextEventRxPresenter(nextEventLoader: nextEventLoader);
+    final presenter = NextEventRxPresenter(nextEventLoader: repo.loadNextEvent);
     final sut = MaterialApp(home: NextEventPage(presenter: presenter, groupId: anyString()));
     await tester.pumpWidget(sut);
     await tester.pump();
