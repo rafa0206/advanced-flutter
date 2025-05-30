@@ -1,3 +1,4 @@
+import 'package:advanced_flutter/domain/entities/errors.dart';
 import 'package:advanced_flutter/domain/entities/next_event.dart';
 import 'package:advanced_flutter/domain/entities/next_event_player.dart';
 
@@ -9,11 +10,13 @@ final class CacheGetClientSpy implements CacheGetClient {
   String? key;
   int callsCount = 0;
   dynamic response;
+  Error? error;
 
   @override
   Future<dynamic> get({ required String key }) async {
     this.key = key;
     callsCount++;
+    if (error != null) throw error!;
     return response;
   }
 }
@@ -33,6 +36,7 @@ final class LoadNextEventCacheRepository {
 
   Future<NextEvent> loadNextEvent({ required String groupId }) async {
     final json = await cacheClient.get(key: '$key:$groupId');
+    if (json == null) throw UnexpectedError();
     return NextEventMapper().toObject(json);
   }
 }
@@ -111,5 +115,18 @@ void main() {
     expect(event.players[1].photo, 'photo 2');
     expect(event.players[1].confirmationDate, DateTime(2024, 1, 1, 12, 30));
     expect(event.players[1].isConfirmed, false);
+  });
+
+  test('should rethrow on error', () async {
+    final error = Error();
+    cacheClient.error = error;
+    final future = sut.loadNextEvent(groupId: groupId);
+    expect(future, throwsA(error));
+  });
+
+  test('should throw UnexpectedError on null response', () async {
+    cacheClient.response = null;
+    final future = sut.loadNextEvent(groupId: groupId);
+    expect(future, throwsA(const TypeMatcher<UnexpectedError>()));
   });
 }
