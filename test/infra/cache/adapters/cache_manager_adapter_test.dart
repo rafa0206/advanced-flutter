@@ -10,9 +10,11 @@ import '../../../mocks/fakes.dart';
 final class CacheManagerAdapter {
   final BaseCacheManager client;
 
-  const CacheManagerAdapter({required this.client});
+  const CacheManagerAdapter({
+    required this.client
+  });
 
-  Future<dynamic> get({required String key}) async {
+  Future<dynamic> get({ required String key }) async {
     final info = await client.getFileFromCache(key);
     if (info?.validTill.isBefore(DateTime.now()) != false || !await info!.file.exists()) return null;
     final data = await info.file.readAsString();
@@ -24,7 +26,7 @@ final class CacheManagerAdapter {
   }
 }
 
-final class FileSpy implements File{
+final class FileSpy implements File {
   int existsCallsCount = 0;
   int readAsStringCallsCount = 0;
   bool _fileExists = true;
@@ -43,7 +45,7 @@ final class FileSpy implements File{
   @override
   Future<String> readAsString({Encoding encoding = utf8}) async {
     readAsStringCallsCount++;
-    return '';
+    return _response;
   }
 
   @override
@@ -180,7 +182,6 @@ final class FileSpy implements File{
 
   @override
   void writeAsStringSync(String contents, {FileMode mode = FileMode.write, Encoding encoding = utf8, bool flush = false}) => throw UnimplementedError();
-
 }
 
 final class CacheManagerSpy implements BaseCacheManager {
@@ -286,12 +287,11 @@ void main() {
     client.file.simulateResponse('''
       {
         "key1": "value1",
-        "key2": "value2"Add commentMore actions
+        "key2": "value2"
       }
     ''');
     final json = await sut.get(key: key);
     expect(json['key1'], 'value1');
     expect(json['key2'], 'value2');
   });
-
 }
