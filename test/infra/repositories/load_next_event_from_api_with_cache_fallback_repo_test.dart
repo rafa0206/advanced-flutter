@@ -25,6 +25,19 @@ final class LoadNextEventRepositorySpy {
 }
 
 void main() {
+
+  late String groupId;
+  late LoadNextEventRepositorySpy apiRepo;
+  late LoadNextEventFromApiWithCacheFallbackRepository sut;
+
+  setUp(() {
+    groupId = anyString();
+    apiRepo = LoadNextEventRepositorySpy();
+    sut = LoadNextEventFromApiWithCacheFallbackRepository(
+        loadNextEventFromApi: apiRepo.loadNextEvent,
+    );
+  });
+
   test('should load event data from api repo', () async {
     final groupId = anyString();
     final apiRepo = LoadNextEventRepositorySpy();
