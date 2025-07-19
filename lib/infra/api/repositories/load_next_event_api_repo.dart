@@ -2,7 +2,6 @@ import 'package:advanced_flutter/domain/entities/errors.dart';
 import 'package:advanced_flutter/domain/entities/next_event.dart';
 import 'package:advanced_flutter/infra/api/clients/http_get_client.dart';
 import 'package:advanced_flutter/infra/mappers/next_event_mapper.dart';
-// import 'package:advanced_flutter/infra/api/mappers/next_event_mapper.dart';
 
 //use-case deletado
 // final class LoadNextEventApiRepository implements LoadNextEventRepository {
@@ -20,7 +19,7 @@ final class LoadNextEventApiRepository {
   Future<NextEvent> loadNextEvent({ required String groupId }) async {
     final json = await httpClient.get(url: url, params: { "groupId": groupId });
     if (json == null) throw UnexpectedError();
-    return NextEventMapper().toObject(json);
+    return NextEventMapper().toDto(json);
   }
 
 }
