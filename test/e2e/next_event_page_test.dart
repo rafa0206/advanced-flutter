@@ -1,6 +1,8 @@
 import 'package:advanced_flutter/domain/usecases/next_event_loader.dart';
 import 'package:advanced_flutter/infra/api/adapters/http_adapter.dart';
 import 'package:advanced_flutter/infra/api/repositories/load_next_event_api_repo.dart';
+import 'package:advanced_flutter/infra/mappers/next_event_mapper.dart';
+import 'package:advanced_flutter/infra/mappers/next_event_player_mapper.dart';
 import 'package:advanced_flutter/presentation/rx/next_event_rx_presenter.dart';
 import 'package:advanced_flutter/ui/pages/next_event_page.dart';
 
@@ -72,7 +74,11 @@ void main() {
     }
     ''';
     final httpClient = HttpAdapter(client: client);
-    final repo = LoadNextEventApiRepository(httpClient: httpClient, url: anyString());
+    final repo = LoadNextEventApiRepository(
+      httpClient: httpClient,
+      url: anyString(),
+      mapper: NextEventMapper(playerMapper: NextEventPlayerMapper())
+    );
     //use-case
     // final nextEventLoader = NextEventLoader(repo: repo);
     // final presenter = NextEventRxPresenter(nextEventLoader: nextEventLoader);
