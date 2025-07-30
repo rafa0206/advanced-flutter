@@ -26,7 +26,7 @@ final class HttpAdapter implements HttpGetClient {
     return _handleResponse(response);
   }
 
-  T? _handleResponse<T>(Response response) {
+  dynamic _handleResponse(Response response) {
     switch (response.statusCode) {
       case 200:
         {
