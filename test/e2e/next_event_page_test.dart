@@ -12,10 +12,16 @@ import '../infra/api/mocks/client_spy.dart';
 import '../mocks/fakes.dart';
 
 void main() {
-  testWidgets('should present next event page', (tester) async {
-    final client = ClientSpy();
-    client.responseJson = '''
-    {
+  late String responseJson;
+  late ClientSpy client;
+  late HttpAdapter httpClient;
+  late LoadNextEventApiRepository apiRepo;
+  late NextEventRxPresenter presenter;
+  late MaterialApp sut;
+
+  setUpAll(() {
+    responseJson = '''
+      {
         "id": "1",
         "groupName": "Contra - Rua de cima vs Rua de baixo",
         "date": "2024-01-11T11:10:00.000Z",
@@ -72,17 +78,25 @@ void main() {
         }]
     }
     ''';
-    final httpClient = HttpAdapter(client: client);
-    final repo = LoadNextEventApiRepository(
+  });
+
+  setUp(() {
+    client = ClientSpy();
+    client.responseJson = responseJson;
+    httpClient = HttpAdapter(client: client);
+    apiRepo = LoadNextEventApiRepository(
       httpClient: httpClient,
       url: anyString(),
-      mapper: makeNextEventMapper()
+      mapper: makeNextEventMapper(),
     );
     //use-case
     // final nextEventLoader = NextEventLoader(repo: repo);
     // final presenter = NextEventRxPresenter(nextEventLoader: nextEventLoader);
-    final presenter = NextEventRxPresenter(nextEventLoader: repo.loadNextEvent);
-    final sut = MaterialApp(home: NextEventPage(presenter: presenter, groupId: anyString()));
+    presenter = NextEventRxPresenter(nextEventLoader: apiRepo.loadNextEvent);
+    sut = MaterialApp(home: NextEventPage(presenter: presenter, groupId: anyString()));
+  });
+
+  testWidgets('should present next event page', (tester) async {
     await tester.pumpWidget(sut);
     await tester.pump();
     await tester.ensureVisible(find.text('Rafael Fernandes', skipOffstage: false));
