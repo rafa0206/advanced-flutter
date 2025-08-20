@@ -95,4 +95,11 @@ void main() {
     expect(httpClient.headers, isNull);
   });
 
+  test('should rethrow on CacheClient error', () async {
+    final error = Error();
+    cacheClient.error = error;
+    final future = sut.get(url: url);
+    expect(future, throwsA(error));
+  });
+
 }
